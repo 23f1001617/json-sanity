@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rates Table</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .dark-mode {
+            background-color: #333;
+            color: #f4f4f4;
+        }
+        button {
+            margin: 20px 0;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Rates Table</h1>
+<button id="toggle-theme">Toggle Theme</button>
+<div id="data-output"></div>
+<p id="error-message" style="color: red;"></p>
+
+<script>
+    async function fetchData() {
+        try {
+            const response = await fetch('./rates.json');
+            if (!response.ok) throw new Error('Network response was not ok');
+            const data = await response.json();
+            renderData(data);
+        } catch (error) {
+            document.getElementById('error-message').innerText = 'Failed to load data.';
+        }
+    }
+
+    function renderData(data) {
+        const table = document.createElement('table');
+        const headerRow = document.createElement('tr');
+        headerRow.innerHTML = '<th>Key</th><th>Value</th>';
+        table.appendChild(headerRow);
+
+        for (const [key, value] of Object.entries(data)) {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${key}</td><td>${Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(parseFloat(value))}</td>`;
+            table.appendChild(row);
+        }
+
+        document.getElementById('data-output').appendChild(table);
+    }
+
+    document.getElementById('toggle-theme').addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+    });
+
+    fetchData();
+</script>
+
+<!-- build-id: 2023-10-01T12:00:00Z -->
+
+        <script>
+        // 🔄 Universal JSON handler
+        async function handleJSON() {
+            try {
+                const res = await fetch('./rates.json');
+                if (!res.ok) throw new Error('No rates.json found, checking products.json');
+                const data = await res.json();
+                let total = 0;
+                if (Array.isArray(data)) {
+                    data.forEach(item => {
+                        for (const key in item) {
+                            const val = parseFloat(item[key]);
+                            if (!isNaN(val)) total += val;
+                        }
+                    });
+                } else {
+                    for (const key in data) {
+                        const val = parseFloat(data[key]);
+                        if (!isNaN(val)) total += val;
+                    }
+                }
+                const el = document.querySelector('#total-sales') || document.querySelector('#total-json');
+                if (el) el.textContent = 'Total (JSON): $' + total.toFixed(2);
+            } catch (e) {
+                console.error('JSON parse failed', e);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', handleJSON);
+        </script>
+        </body>
+</html>
+<!-- build-id: 2025-10-16T11:47:22.906002 -->
